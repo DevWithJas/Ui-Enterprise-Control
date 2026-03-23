@@ -55,8 +55,8 @@ export default function CameraCapture({ onPlateDetected }) {
     canvas.height = video.videoHeight
     const ctx = canvas.getContext('2d')
     
-    // Auto-enhance image for OCR: B&W, extreme contrast
-    ctx.filter = 'grayscale(100%) contrast(250%) brightness(120%)'
+    // Auto-enhance image for OCR: B&W, moderate contrast
+    ctx.filter = 'grayscale(100%) contrast(150%)'
     ctx.drawImage(video, 0, 0)
     
     // Optional: We can sharpen it further natively if needed, but extreme contrast usually works wonders for plates
@@ -76,9 +76,10 @@ export default function CameraCapture({ onPlateDetected }) {
         }
       })
       
-      // Strict whitelist: Only uppercase letters and numbers (no lowercase, no punctuation)
+      // Strict whitelist + Sparse Text PSM (crucial for finding small text in images)
       await worker.setParameters({
         tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',
+        tessedit_pageseg_mode: '11',
       })
       
       const { data: { text } } = await worker.recognize(canvas)
