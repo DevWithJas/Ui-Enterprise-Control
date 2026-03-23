@@ -1,0 +1,235 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Number plate input — classic Indian plate yellow style */
+.plateInput {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #fff8dc;
+  border: 2px solid #1a3a5c;
+  border-radius: var(--radius);
+  padding: 0 10px;
+  gap: 6px;
+  min-width: 0;
+}
+.plateInput:focus-within {
+  border-color: #0f2540;
+  box-shadow: 0 0 0 3px rgba(26,58,92,0.12);
+}
+
+.plateFlag { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+.plateDivider {
+  width: 2px;
+  height: 28px;
+  background: #1a3a5c;
+  opacity: 0.3;
+  flex-shrink: 0;
+}
+
+.plateText {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  font-family: 'Inter', monospace;
+  padding: 10px 0;
+}
+.plateText::placeholder {
+  color: rgba(15,23,42,0.25);
+  letter-spacing: 1px;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+}
+
+.clearBtn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.clearBtn:hover { background: var(--error-bg); color: var(--error); border-color: var(--error); }
+
+/* Camera scan button */
+.cameraBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1.5px dashed var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.2px;
+  width: 100%;
+}
+.cameraBtn:hover {
+  background: var(--accent-subtle);
+}
+.cameraBtn:active {
+  transform: scale(0.98);
+}
+.cameraBtn svg { width: 20px; height: 20px; }
+
+/* Viewfinder */
+.viewfinder {
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16/9;
+  position: relative;
+  box-shadow: var(--shadow-md);
+  animation: fadeUp 0.25s ease;
+  max-height: 180px;
+}
+
+.video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.viewfinderOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+/* Corner bracket aim box */
+.aimBox {
+  width: 75%;
+  height: 35%;
+  position: relative;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  margin-top: 10px;
+}
+.aimBox::before, .aimBox::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: white;
+  border-style: solid;
+}
+.aimBox::before { top: -2px; left: -2px; border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+.aimBox::after  { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+.viewControls {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cancelBtn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+}
+.cancelBtn:hover { background: rgba(255,255,255,0.25); }
+
+.captureBtn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.6);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s;
+}
+.captureBtn:active { transform: scale(0.9); }
+.captureInner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: white;
+}
+
+/* OCR scanning screen */
+.scanningState {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(0,0,0,0.75);
+  padding: 32px;
+}
+
+.scanProgress {
+  width: 80%;
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.scanBar {
+  height: 100%;
+  background: white;
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+.scanLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 0.3px;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--error);
+  font-weight: 500;
+}
+
+.detectedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--success-bg);
+  border: 1px solid rgba(15,81,50,0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  animation: popIn 0.25s ease;
+}

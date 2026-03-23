@@ -1,0 +1,111 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  flex: 1;
+}
+
+.card {
+  position: relative;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px 12px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  min-height: 0;
+}
+.card:active { transform: scale(0.97); }
+
+.card.active {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.iconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.active .iconWrap { background: var(--accent); color: white; }
+.iconWrap svg { width: 18px; height: 18px; }
+
+.label {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  line-height: 1;
+}
+
+.check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  animation: popIn 0.18s ease;
+}
+
+.wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+
+/* Sub-type pills — horizontal row */
+.subTypeRow {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.18s ease;
+}
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+}
+.pill:active { transform: scale(0.95); }
+.pillActive {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
