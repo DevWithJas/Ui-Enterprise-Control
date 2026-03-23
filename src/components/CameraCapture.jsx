@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { createWorker } from 'tesseract.js'
 import styles from './CameraCapture.module.css'
 
@@ -27,15 +27,18 @@ export default function CameraCapture({ onPlateDetected }) {
         video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
       })
       streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play()
-      }
       setMode('camera')
     } catch {
       setError('Camera permission denied. Please enter plate manually.')
     }
   }, [])
+
+  useEffect(() => {
+    if (mode === 'camera' && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current
+      videoRef.current.play().catch(e => console.warn('Autoplay prevented:', e))
+    }
+  }, [mode])
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop())
@@ -127,7 +130,7 @@ export default function CameraCapture({ onPlateDetected }) {
       {/* Live camera view */}
       {(mode === 'camera' || mode === 'scanning') && (
         <div className={styles.viewfinder}>
-          {mode === 'camera' && <video ref={videoRef} className={styles.video} playsInline muted />}
+          {mode === 'camera' && <video ref={videoRef} className={styles.video} autoPlay playsInline muted />}
 
           {mode === 'camera' && (
             <div className={styles.viewfinderOverlay}>
