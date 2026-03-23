@@ -1,13 +1,17 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
-import { createWorker } from 'tesseract.js'
 import styles from './CameraCapture.module.css'
 
-// Extract a likely Indian number plate from raw OCR text
+// Extract plate OR return generic text if it's not a plate
 function extractPlate(rawText) {
-  const cleaned = rawText.toUpperCase().replace(/\s+/g, '').replace(/[^A-Z0-9]/g, '')
-  // Indian plate pattern: XX00XX0000 or similar
-  const match = cleaned.match(/[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{3,4}/)
-  return match ? match[0] : cleaned.slice(0, 10)
+  if (!rawText) return ''
+  const cleanedPlate = rawText.toUpperCase().replace(/\s+/g, '').replace(/[^A-Z0-9]/g, '')
+  const match = cleanedPlate.match(/[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{3,4}/)
+  
+  // If it firmly looks like a plate, return exact plate string
+  if (match) return match[0]
+  
+  // Otherwise, return the generic text they scanned
+  return rawText.replace(/\n/g, ' ').trim().slice(0, 30)
 }
 
 export default function CameraCapture({ onPlateDetected }) {
@@ -54,40 +58,49 @@ export default function CameraCapture({ onPlateDetected }) {
     canvas.width = video.videoWidth
     canvas.height = video.videoHeight
     const ctx = canvas.getContext('2d')
-    
-    // Auto-enhance image for OCR: B&W, moderate contrast
-    ctx.filter = 'grayscale(100%) contrast(150%)'
-    ctx.drawImage(video, 0, 0)
-    
-    // Optional: We can sharpen it further natively if needed, but extreme contrast usually works wonders for plates
+    ctx.drawImage(video, 0, 0) // No extreme filters needed for cloud ML models
 
     // Stop camera, go to scanning mode
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
     setMode('scanning')
-    setOcrProgress(0)
+    setOcrProgress(50) // Fake progress for API wait
 
     try {
-      const worker = await createWorker('eng', 1, {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setOcrProgress(Math.round((m.progress || 0) * 100))
-          }
-        }
-      })
-      
-      // Strict whitelist + Sparse Text PSM (crucial for finding small text in images)
-      await worker.setParameters({
-        tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ',
-        tessedit_pageseg_mode: '11',
-      })
-      
-      const { data: { text } } = await worker.recognize(canvas)
-      await worker.terminate()
+      let text = ''
 
-      const plate = extractPlate(text)
-      setPlateValue(plate)
-      onPlateDetected?.(plate)
+      // Attempt 1: Native Android Chrome ML Kit (if experimental flags enabled)
+      if ('TextDetector' in window) {
+        try {
+          const detector = new window.TextDetector()
+          const texts = await detector.detect(canvas)
+          text = texts.map(t => t.rawValue).join(' ')
+        } catch (e) { console.warn('Native detector failed', e) }
+      }
+
+      // Attempt 2: Cloud Vision OCR API (Engine 2: robust for generic text & numbers)
+      if (!text || text.trim().length <= 1) {
+        const formData = new FormData()
+        formData.append('base64Image', canvas.toDataURL('image/jpeg', 0.8))
+        formData.append('apikey', 'helloworld') // Free public dev key
+        formData.append('OCREngine', '2') 
+        
+        const res = await fetch('https://api.ocr.space/parse/image', {
+          method: 'POST', body: formData
+        })
+        const data = await res.json()
+        if (data.ParsedResults && data.ParsedResults.length > 0) {
+          text = data.ParsedResults[0].ParsedText
+        }
+      }
+
+      setOcrProgress(100)
+      
+      const parsed = extractPlate(text)
+      if (!parsed) throw new Error('No text found')
+      
+      setPlateValue(parsed)
+      onPlateDetected?.(parsed)
       setMode('done')
     } catch (e) {
       setError('OCR failed. Please enter plate manually.')
